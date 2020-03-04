@@ -1,0 +1,21 @@
+FROM openfaas/of-watchdog:0.7.6 as watchdog
+
+FROM clojure:openjdk-14-lein-2.9.1-alpine as preparebuild
+WORKDIR /root/
+COPY project.clj project.clj
+RUN lein deps
+
+
+FROM clojure:openjdk-14-lein-2.9.1-alpine as builder
+WORKDIR /root/
+COPY --from=preparebuild /root/.m2 /root/.m2
+COPY src src
+COPY project.clj project.clj
+RUN apk add --update nodejs npm
+RUN npm install --only=production
+RUN apk add bash
+RUN lein shadow compile :app
+EXPOSE 4000
+CMD ["lein", "repl"]
+
+

@@ -1,0 +1,18 @@
+version: 1.0
+provider:
+  name: openfaas
+  gateway: http://127.0.0.1:8080
+functions:
+  rand-name:
+    lang: dockerfile
+    handler: ./rand-name
+    image: openclojure:latest
+    environment:
+        read_timeout: 60s
+        write_timeout: 60s
+    annotations:
+     com.openfaas.health.http.initialDelay: "30s"
+    limits:
+     memory: 800Mi
+    requests:
+     memory: 200Mi
